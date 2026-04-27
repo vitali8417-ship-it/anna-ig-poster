@@ -1,0 +1,28 @@
+[Unit]
+Description=Anna's Instagram Posting API (FastAPI + Uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=anna
+Group=anna
+WorkingDirectory=/opt/anna-ig-poster
+EnvironmentFile=/opt/anna-ig-poster/.env
+ExecStart=/opt/anna-ig-poster/.venv/bin/uvicorn api:app --host 127.0.0.1 --port 8765
+Restart=always
+RestartSec=5
+
+# Logs gehen ans journal (anzeigen mit: journalctl -u anna-ig-api -f)
+StandardOutput=journal
+StandardError=journal
+
+# Sicherheits-Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/anna-ig-poster
+
+[Install]
+WantedBy=multi-user.target

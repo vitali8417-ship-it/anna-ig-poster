@@ -1,0 +1,47 @@
+# ============================================================
+# Anna's automatisches Instagram-Posting - Konfiguration
+# ============================================================
+# Anna (Hermes-Agent-Bot) erzeugt ihren Content selbst und ruft
+# diese Tools auf, um auf Instagram zu posten.
+# ============================================================
+
+account:
+  name: "Anna"
+  niche: "Authentische Marketing-Strategien & Personal Branding fuer Selbststaendige und Unternehmer"
+  language: "de"
+  content_pillars:
+    - "Marketing-Tipps & Hacks"
+    - "Myths Busted"
+    - "Behind the Scenes"
+    - "Wins & Case Studies"
+
+# Default-Hashtags, die *immer* an einen Post angehaengt werden, wenn Anna
+# keine eigenen mitgibt. Anna kann diese ueberschreiben.
+default_hashtags:
+  - "#marketingstrategie"
+  - "#personalbranding"
+  - "#selbststaendig"
+  - "#unternehmertum"
+  - "#contentmarketing"
+
+# Hashtags, die NIE genutzt werden (Spam-Risiko / Shadowban)
+hashtag_blacklist:
+  - "#follow4follow"
+  - "#like4like"
+  - "#followforfollow"
+
+# Bild-Hosting: Instagram Graph API braucht oeffentliche URLs.
+# Optionen: imgur (kostenlos, einfach), cloudinary, s3, custom
+image_hosting:
+  provider: "imgur"  # imgur | none (wenn Anna selbst URLs bereitstellt)
+
+# HTTP-API (optional, fuer agentische Aufrufe)
+api:
+  host: "127.0.0.1"
+  port: 8765
+  # Falls gesetzt, muss jeder Request den Header 'X-API-Key: <wert>' tragen
+  api_key_required: true
+
+logging:
+  level: "INFO"
+  file: "logs/posting.log"
