@@ -61,6 +61,7 @@ class InstagramPublisher:
 
         image_url = self._upload_to_imgur(image_path)
         creation_id = self._create_image_container(image_url, full_caption)
+        self._wait_for_finished(creation_id)
         return self._publish(creation_id)
 
     def post_carousel(self, image_paths: list[str], caption: str, hashtags: list[str]) -> dict:
@@ -80,6 +81,7 @@ class InstagramPublisher:
 
         # 2. Carousel-Container erzeugen
         creation_id = self._create_carousel_container(child_ids, full_caption)
+        self._wait_for_finished(creation_id)
         return self._publish(creation_id)
 
     def post_reel(self, video_path: str, caption: str, hashtags: list[str], cover_path: Optional[str] = None) -> dict:
@@ -101,6 +103,7 @@ class InstagramPublisher:
 
         image_url = self._upload_to_imgur(image_path)
         creation_id = self._create_story_container(image_url)
+        self._wait_for_finished(creation_id)
         return self._publish(creation_id)
 
     # ==================================================================

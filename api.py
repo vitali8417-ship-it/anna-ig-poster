@@ -124,9 +124,12 @@ def post_feed(body: FeedPost, x_api_key: Optional[str] = Header(None)):
         path = _b64_to_tempfile(body.image_b64)
     elif body.image_url and not path:
         # URL ist bereits oeffentlich -> wir umgehen Imgur und reichen sie direkt durch.
-        # Dafuer rufen wir den internen Container-Endpoint an.
+        # DRY_RUN respektieren - sonst geht der Call direkt an Graph API trotz Test-Modus.
+        if pub.dry_run:
+            return pub._dry("feed_image", body.image_url, pub._build_caption(body.caption, body.hashtags))
         try:
             cid = pub._create_image_container(body.image_url, pub._build_caption(body.caption, body.hashtags))
+            pub._wait_for_finished(cid)
             return pub._publish(cid)
         except PublishError as e:
             raise HTTPException(502, str(e))
@@ -145,9 +148,12 @@ def post_carousel(body: CarouselPost, x_api_key: Optional[str] = Header(None)):
     elif body.image_urls:
         # Falls bereits oeffentliche URLs: direkt durchreichen
         pub = _publisher()
+        if pub.dry_run:
+            return pub._dry("carousel", body.image_urls, pub._build_caption(body.caption, body.hashtags))
         try:
             child_ids = [pub._create_carousel_child(u) for u in body.image_urls]
             cid = pub._create_carousel_container(child_ids, pub._build_caption(body.caption, body.hashtags))
+            pub._wait_for_finished(cid)
             return pub._publish(cid)
         except PublishError as e:
             raise HTTPException(502, str(e))
@@ -167,8 +173,11 @@ def post_story(body: StoryPost, x_api_key: Optional[str] = Header(None)):
         raise HTTPException(400, "image_url oder image_b64 erforderlich")
     pub = _publisher()
     if body.image_url:
+        if pub.dry_run:
+            return pub._dry("story", body.image_url, "")
         try:
             cid = pub._create_story_container(body.image_url)
+            pub._wait_for_finished(cid)
             return pub._publish(cid)
         except PublishError as e:
             raise HTTPException(502, str(e))
@@ -183,6 +192,8 @@ def post_story(body: StoryPost, x_api_key: Optional[str] = Header(None)):
 def post_reel(body: ReelPost, x_api_key: Optional[str] = Header(None)):
     _check_auth(x_api_key)
     pub = _publisher()
+    if pub.dry_run:
+        return pub._dry("reel", body.video_url, pub._build_caption(body.caption, body.hashtags))
     try:
         cid = pub._create_reel_container(body.video_url, pub._build_caption(body.caption, body.hashtags))
         pub._wait_for_finished(cid)
